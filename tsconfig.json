@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "lib": ["esnext"],
+    "declaration": true,
+    "outDir": "lib-es",
+    "rootDir": "lib-ts",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@": ["lib-ts"]
+    },
+    "esModuleInterop": true
+  },
+  "include": [
+    "lib-ts/**/*"
+  ],
+  "exclude": [
+    "tests/**/*"
+  ]
+}
