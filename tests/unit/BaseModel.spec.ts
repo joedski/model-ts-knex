@@ -1,4 +1,4 @@
-import { BaseModel } from "./fixtures";
+import { BaseModel, FooModel } from "./fixtures";
 import ModelField from "../../lib-ts/ModelField";
 
 describe('BaseModel functionality', () => {
@@ -26,5 +26,19 @@ describe('BaseModel functionality', () => {
     const SomeOtherTestModel = new $SomeOtherTestModel();
 
     expect(SomeOtherTestModel.tableName).toBe('totally_different_name');
+  })
+
+  describe('Query Builder Methods', () => {
+    test('should build a basic select with #findWhere', () => {
+      expect(FooModel.findWhere({ bar_id: 4 }).toString()).toMatchSnapshot();
+      expect(FooModel.findWhere({ bar_id: 4 }, ['id']).toString()).toMatchSnapshot();
+      expect(FooModel.findWhere({ bar_id: 4 }, ['id', 'foo']).toString()).toMatchSnapshot();
+    })
+
+    test('should build a basic select limited to 1 item with #findOneWhere', () => {
+      expect(FooModel.findOneWhere({ bar_id: 4 }).toString()).toMatchSnapshot();
+      expect(FooModel.findOneWhere({ bar_id: 4 }, ['id']).toString()).toMatchSnapshot();
+      expect(FooModel.findOneWhere({ bar_id: 4 }, ['id', 'foo']).toString()).toMatchSnapshot();
+    })
   })
 });

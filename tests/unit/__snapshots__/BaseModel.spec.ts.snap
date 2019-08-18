@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 1`] = `"select * from \\"foo\\" where \\"bar_id\\" = 4 limit 1"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 2`] = `"select \\"id\\" from \\"foo\\" where \\"bar_id\\" = 4 limit 1"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 3`] = `"select \\"id\\", \\"foo\\" from \\"foo\\" where \\"bar_id\\" = 4 limit 1"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 1`] = `"select * from \\"foo\\" where \\"bar_id\\" = 4"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 2`] = `"select \\"id\\" from \\"foo\\" where \\"bar_id\\" = 4"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 3`] = `"select \\"id\\", \\"foo\\" from \\"foo\\" where \\"bar_id\\" = 4"`;

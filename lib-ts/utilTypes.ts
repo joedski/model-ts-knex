@@ -4,6 +4,8 @@ import ModelField from './ModelField';
 // Copied from knex's .d.ts file.
 type SafePartial<T> = T extends {} ? Partial<T> : any;
 
+export type AnyArray<T> = T[] | readonly T[];
+
 /**
  * Any knex object that can be used to build queries.
  */
@@ -15,6 +17,10 @@ export type AnyKnex<
   | Transaction<TRecord, TResult>
   | QueryBuilder<TRecord, TResult>
   | Knex<TRecord, TResult>;
+
+export type ModelFieldKeys<
+  TModel extends { fields: Record<string, AnyModelField> }
+> = keyof TModel['fields'];
 
 /**
  * Convenience alias mostly used for conditional types.

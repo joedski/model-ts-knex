@@ -1,4 +1,4 @@
-import { AnyKnex, AnyModelField } from './utilTypes';
+import { AnyKnex, AnyModelField, RecordType, ModelFieldKeys, AnyArray } from './utilTypes';
 import { tableNameOfModelClassName } from './util';
 
 export interface CreateBaseModelOptions {
@@ -36,6 +36,27 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
     thisWithTransaction.knex = trx;
     return thisWithTransaction;
   }
+
+  // Query Builders.
+
+  public findWhere(
+    where: Partial<RecordType<BaseModel<TFields>>>,
+    select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
+  ) {
+    return this.knex.from(this.tableName)
+      .select(select)
+      .where(where)
+      ;
+  }
+
+  public findOneWhere(
+    where: Partial<RecordType<BaseModel<TFields>>>,
+    select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
+  ) {
+    return this.findWhere(where, select).limit(1);
+  }
+
+  // JSON Schema stuff.
 
   public toRecordJSONSchema() {
     // Not entirely happy with the return type, but at least for now
