@@ -6,7 +6,7 @@ import { RecordType, NewRecordType } from '../../lib-ts/utilTypes';
 /**
  * An instance purely for example.
  */
-export const knex = Knex({ client: "pg" });
+export const knex = Knex({ client: 'pg' });
 
 /**
  * Our BaseModel (factory) for tests.
@@ -15,12 +15,11 @@ export const BaseModel = defineBaseModel({ knex });
 
 class $FooModel extends BaseModel({
   fields: {
-    id: ModelField.increments()
-      .notInNew(),
+    id: ModelField.increments().notInNew(),
     foo: ModelField.integer(),
     bar_id: ModelField.unsignedInteger().references(() => BarModel, 'id'),
-  }
-}) { }
+  },
+}) {}
 
 export const FooModel = new $FooModel();
 
@@ -31,8 +30,8 @@ class $BarModel extends BaseModel({
   fields: {
     id: ModelField.increments().notInNew(),
     name: ModelField.string().notNullable(),
-  }
-}) {};
+  },
+}) {}
 
 export const BarModel = new $BarModel();
 
@@ -57,12 +56,20 @@ class $KitchenSinkModel extends BaseModel({
     time: ModelField.time().notNullable(),
     timestamp: ModelField.timestamp({ useTz: true }).notNullable(),
     // binary?
-    enum: ModelField.enum(['foo', 'bar', 'baz', 'frabnobz', 'diganobz'] as const).notNullable(),
+    enum: ModelField.enum([
+      'foo',
+      'bar',
+      'baz',
+      'frabnobz',
+      'diganobz',
+    ] as const).notNullable(),
     json: ModelField.json(),
     jsonb: ModelField.jsonb(),
     uuid: ModelField.uuid().notNullable(),
-    fk: ModelField.unsignedInteger().notNullable().references(() => BarModel, 'id'),
-  }
+    fk: ModelField.unsignedInteger()
+      .notNullable()
+      .references(() => BarModel, 'id'),
+  },
 }) {}
 
 export const KitchenSinkModel = new $KitchenSinkModel();

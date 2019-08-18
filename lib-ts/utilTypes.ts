@@ -1,5 +1,5 @@
-import Knex, { Transaction, QueryBuilder } from "knex";
-import ModelField from "./ModelField";
+import Knex, { Transaction, QueryBuilder } from 'knex';
+import ModelField from './ModelField';
 
 // Copied from knex's .d.ts file.
 type SafePartial<T> = T extends {} ? Partial<T> : any;
@@ -11,7 +11,7 @@ type SafePartial<T> = T extends {} ? Partial<T> : any;
 export type AnyKnex<
   TRecord extends {} = any,
   TResult = SafePartial<TRecord>[]
-  > =
+> =
   | Transaction<TRecord, TResult>
   | QueryBuilder<TRecord, TResult>
   | Knex<TRecord, TResult>;
@@ -27,20 +27,25 @@ export type AnyModelField = ModelField<any, boolean, boolean>;
  */
 type NewRecordFieldKeys<TFields> = TFields extends Record<string, AnyModelField>
   ? keyof TFields extends infer TKeys
-  ? TKeys extends keyof TFields
-  ? TFields[TKeys] extends ModelField<any, true, any>
-  ? TKeys
-  : never
-  : never
-  : never
+    ? TKeys extends keyof TFields
+      ? TFields[TKeys] extends ModelField<any, true, any>
+        ? TKeys
+        : never
+      : never
+    : never
   : never;
 
 /**
  * Extract the TS type from a ModelField, accounting for nullability.
  */
-export type RecordFieldType<T> =
-  T extends ModelField<infer TSType, boolean, infer NotNullable>
-  ? NotNullable extends true ? TSType : TSType | null
+export type RecordFieldType<T> = T extends ModelField<
+  infer TSType,
+  boolean,
+  infer NotNullable
+>
+  ? NotNullable extends true
+    ? TSType
+    : TSType | null
   : never;
 
 /**
@@ -48,10 +53,10 @@ export type RecordFieldType<T> =
  */
 export type RecordType<
   TModel extends { fields: Record<string, AnyModelField> }
-  > = TModel["fields"] extends Record<string, AnyModelField>
+> = TModel['fields'] extends Record<string, AnyModelField>
   ? {
-    [K in keyof TModel["fields"]]: RecordFieldType<TModel["fields"][K]>;
-  }
+      [K in keyof TModel['fields']]: RecordFieldType<TModel['fields'][K]>;
+    }
   : never;
 
 /**
@@ -59,4 +64,4 @@ export type RecordType<
  */
 export type NewRecordType<
   TModel extends { fields: Record<string, AnyModelField> }
-  > = Pick<RecordType<TModel>, NewRecordFieldKeys<TModel["fields"]>>;
+> = Pick<RecordType<TModel>, NewRecordFieldKeys<TModel['fields']>>;

@@ -1,6 +1,6 @@
-import { Raw } from "knex";
-import { BaseModel } from "./BaseModel";
-import { AnyModelField } from "./utilTypes";
+import { Raw } from 'knex';
+import { BaseModel } from './BaseModel';
+import { AnyModelField } from './utilTypes';
 
 type ColumnType =
   /**
@@ -25,11 +25,14 @@ type ColumnType =
   | ['time', number | null]
   | ['timestamp', { useTz?: boolean; precision?: number }]
   | ['binary']
-  | ['enum', string[] | readonly string[] | null, { useNative?: boolean; enumName?: string }]
+  | [
+      'enum',
+      string[] | readonly string[] | null,
+      { useNative?: boolean; enumName?: string }
+    ]
   | ['json']
   | ['jsonb']
-  | ['uuid']
-  ;
+  | ['uuid'];
 
 export interface ModelFieldForeignKeyConstraint {
   model: BaseModel<Record<string, AnyModelField>>;
@@ -38,7 +41,11 @@ export interface ModelFieldForeignKeyConstraint {
   onUpdate: null | string | Raw;
 }
 
-export default class ModelField<TSType, InNew extends boolean = true, NotNullable extends boolean = false> {
+export default class ModelField<
+  TSType,
+  InNew extends boolean = true,
+  NotNullable extends boolean = false
+> {
   // Type Factory Helpers
 
   public static increments() {
@@ -62,10 +69,18 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
     return new ModelField<string>(['string', length]);
   }
   public static float(precision?: number, scale?: number) {
-    return new ModelField<number>(['float', typeof precision === 'number' ? precision : null, typeof scale === 'number' ? scale : null]);
+    return new ModelField<number>([
+      'float',
+      typeof precision === 'number' ? precision : null,
+      typeof scale === 'number' ? scale : null,
+    ]);
   }
   public static decimal(precision?: number, scale?: number) {
-    return new ModelField<number>(['decimal', typeof precision === 'number' ? precision : null, typeof scale === 'number' ? scale : null]);
+    return new ModelField<number>([
+      'decimal',
+      typeof precision === 'number' ? precision : null,
+      typeof scale === 'number' ? scale : null,
+    ]);
   }
   public static boolean() {
     return new ModelField<boolean>(['boolean']);
@@ -74,21 +89,31 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
     // TODO: You can toggle parsing of dates and get back strings.  How to account for that?
     return new ModelField<Date>(['date']);
   }
-  public static datetime(options: { useTz?: boolean; precision?: number } = {}) {
+  public static datetime(
+    options: { useTz?: boolean; precision?: number } = {}
+  ) {
     // TODO: You can toggle parsing of datetimes and get back strings.  How to account for that?
     return new ModelField<Date>(['datetime', options]);
   }
   public static time(precision?: number) {
-    return new ModelField<string>(['time', typeof precision === 'number' ? precision : null]);
+    return new ModelField<string>([
+      'time',
+      typeof precision === 'number' ? precision : null,
+    ]);
   }
-  public static timestamp(options: { useTz?: boolean; precision?: number } = {}) {
+  public static timestamp(
+    options: { useTz?: boolean; precision?: number } = {}
+  ) {
     return new ModelField<Date>(['timestamp', options]);
   }
   public static binary() {
     // TODO: What's the actual types used here?  Have to check all the drivers, I guess.
     return new ModelField<Buffer | Uint8Array>(['binary']);
   }
-  public static enum<TValues extends string[] | readonly string[]>(values: TValues, options: { useNative?: boolean; enumName?: string } = {}) {
+  public static enum<TValues extends string[] | readonly string[]>(
+    values: TValues,
+    options: { useNative?: boolean; enumName?: string } = {}
+  ) {
     // TODO: Need better enum typing.  Any way to obviate need for `as const`?
     return new ModelField<TValues[number]>(['enum', values, options]);
   }
@@ -131,7 +156,11 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
   // for useful derivation via RecordFieldType<T>.
 
   public useInNew<TInNew extends boolean>(inNew: TInNew) {
-    const next = this as ModelField<TSType, boolean, NotNullable> as ModelField<TSType, TInNew, NotNullable>;
+    const next = (this as ModelField<
+      TSType,
+      boolean,
+      NotNullable
+    >) as ModelField<TSType, TInNew, NotNullable>;
     next.$useInNew = inNew;
     return next;
   }
@@ -186,7 +215,10 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
    * @param modelGetter Function returning a Model interface instance.
    * @param fieldName Field name on that Model interface instance.
    */
-  public references<TModel extends BaseModel<Record<string, AnyModelField>>>(modelGetter: () => TModel, fieldName: Extract<keyof TModel['fields'], string>) {
+  public references<TModel extends BaseModel<Record<string, AnyModelField>>>(
+    modelGetter: () => TModel,
+    fieldName: Extract<keyof TModel['fields'], string>
+  ) {
     this.$foreignKeyConstraint = {
       get model() {
         return modelGetter();
@@ -231,7 +263,7 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
           return {
             type: 'string',
             maxLength: this.$type[1] || 256,
-          }
+          };
         }
 
         // These two are serialized as strings since JS will lose precision on them.
@@ -239,47 +271,47 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
         case 'bigInteger':
         case 'text': {
           return {
-            type: 'string'
-          }
+            type: 'string',
+          };
         }
 
         case 'increments': {
           return {
             type: 'integer',
-            minimum: 0
-          }
+            minimum: 0,
+          };
         }
 
         case 'integer': {
           if (this.$unsigned) {
             return {
               type: 'integer',
-              minimum: 0
-            }
+              minimum: 0,
+            };
           }
           return {
-            type: 'integer'
-          }
+            type: 'integer',
+          };
         }
 
         case 'float':
         case 'decimal': {
           return {
-            type: 'number'
-          }
+            type: 'number',
+          };
         }
 
         case 'boolean': {
           return {
-            type: 'boolean'
-          }
+            type: 'boolean',
+          };
         }
 
         case 'date': {
           return {
             type: 'string',
             format: 'date',
-          }
+          };
         }
 
         case 'datetime': {
@@ -293,7 +325,7 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
           return {
             type: 'string',
             format: 'time',
-          }
+          };
         }
 
         case 'timestamp': {
@@ -301,14 +333,14 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
           return {
             type: 'string',
             format: 'date-time',
-          }
+          };
         }
 
         case 'binary': {
           // TODO: how should binary columns be handled?  if at all?
           return {
             type: 'string',
-          }
+          };
         }
 
         case 'enum': {
@@ -319,11 +351,11 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
             return {
               type: 'string',
               enum: this.$type[1],
-            }
+            };
           }
           return {
             type: 'string',
-          }
+          };
         }
 
         case 'json':
@@ -333,15 +365,15 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
           // which would be better than just having that type param
           // hovering around without actually doing anything.
           return {
-            type: 'object'
-          }
+            type: 'object',
+          };
         }
 
         case 'uuid': {
           return {
             type: 'string',
             format: 'uuid',
-          }
+          };
         }
 
         default: {
@@ -355,10 +387,7 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
     }
 
     return {
-      oneOf: [
-        notNullableType,
-        { type: 'null' },
-      ],
+      oneOf: [notNullableType, { type: 'null' }],
     };
   }
 }

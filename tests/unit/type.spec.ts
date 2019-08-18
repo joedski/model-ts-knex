@@ -1,4 +1,9 @@
-import { FooRecord, NewFooRecord, KitchenSinkRecord, NewKitchenSinkRecord } from "./fixtures";
+import {
+  FooRecord,
+  NewFooRecord,
+  KitchenSinkRecord,
+  NewKitchenSinkRecord,
+} from './fixtures';
 
 // As a general note, most of these tests don't actually do much with
 // the variables themselves, rather this is more about the compile step.
@@ -34,7 +39,7 @@ describe('Type Derivation and Assertion', () => {
       jsonb: null,
       uuid: 'b91e1376-99c1-487c-b943-0df9983e5e82',
       fk: 24,
-    }
+    };
 
     expect(fooRecord).toBeTruthy();
     expect(kitchenSinkRecord).toBeTruthy();
@@ -66,7 +71,7 @@ describe('Type Derivation and Assertion', () => {
       jsonb: null,
       uuid: 'b91e1376-99c1-487c-b943-0df9983e5e82',
       fk: 24,
-    }
+    };
 
     expect(newFooRecord).toBeTruthy();
     expect(newKitchenSinkRecord).toBeTruthy();

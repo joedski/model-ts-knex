@@ -10,7 +10,7 @@ export interface CreateBaseModelOptions {
 
 export interface ModelParams<
   TFields extends Record<string, AnyModelField> = {}
-  > {
+> {
   fields: TFields;
 }
 
@@ -20,10 +20,7 @@ export interface ModelParams<
 export class BaseModel<TFields extends Record<string, AnyModelField>> {
   tableName: string | null = null;
 
-  constructor(
-    public knex: AnyKnex,
-    public fields: TFields
-  ) {}
+  constructor(public knex: AnyKnex, public fields: TFields) {}
 
   public toRecordJSONSchema() {
     // Not entirely happy with the return type, but at least for now
@@ -39,13 +36,15 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
         },
         {} as Record<string, object>
       ),
-    }
+    };
   }
 
   public toNewRecordJSONSchema() {
     // Not entirely happy with the return type, but at least for now
     // it's meant to be sorta opaque.
-    const fieldNames = Object.keys(this.fields).filter(key => this.fields[key].$useInNew);
+    const fieldNames = Object.keys(this.fields).filter(
+      key => this.fields[key].$useInNew
+    );
     return {
       type: 'object',
       required: fieldNames,
@@ -56,7 +55,7 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
         },
         {} as Record<string, object>
       ),
-    }
+    };
   }
 }
 

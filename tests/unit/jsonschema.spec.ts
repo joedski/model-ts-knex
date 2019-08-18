@@ -1,4 +1,4 @@
-import { KitchenSinkModel } from "./fixtures";
+import { KitchenSinkModel } from './fixtures';
 
 describe('JSONSchema Generation', () => {
   test('should generate a JSON Schema as expected', () => {
@@ -7,5 +7,5 @@ describe('JSONSchema Generation', () => {
 
     expect(recordSchema).toMatchSnapshot();
     expect(newRecordSchema).toMatchSnapshot();
-  })
-})
+  });
+});
