@@ -1,4 +1,5 @@
 import { AnyKnex, AnyModelField } from './utilTypes';
+import { tableNameOfModelClassName } from './util';
 
 export interface CreateBaseModelOptions {
   /**
@@ -11,6 +12,7 @@ export interface CreateBaseModelOptions {
 export interface ModelParams<
   TFields extends Record<string, AnyModelField> = {}
 > {
+  tableName?: string;
   fields: TFields;
 }
 
@@ -18,9 +20,22 @@ export interface ModelParams<
  * The underlying BaseModel class that gets later parametrized.
  */
 export class BaseModel<TFields extends Record<string, AnyModelField>> {
-  tableName: string | null = null;
+  tableName: string;
 
-  constructor(public knex: AnyKnex, public fields: TFields) {}
+  constructor(public knex: AnyKnex, public fields: TFields) {
+    this.tableName = tableNameOfModelClassName(Object.getPrototypeOf(this).constructor.name);
+  }
+
+  /**
+   * Return a copy of this model instance with the given transaction
+   * as the knex context.
+   * @param trx Knex transaction query builder.
+   */
+  public withTransaction(trx: AnyKnex) {
+    const thisWithTransaction = Object.create(this) as BaseModel<TFields>;
+    thisWithTransaction.knex = trx;
+    return thisWithTransaction;
+  }
 
   public toRecordJSONSchema() {
     // Not entirely happy with the return type, but at least for now
@@ -73,6 +88,9 @@ export function defineBaseModel(options: CreateBaseModelOptions) {
     return class Model extends BaseModel<TModelParams['fields']> {
       constructor() {
         super(options.knex, params.fields);
+        if (params.tableName) {
+          this.tableName = params.tableName;
+        }
       }
     };
   };
