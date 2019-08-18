@@ -23,11 +23,6 @@ type ColumnType =
   | ['uuid']
   ;
 
-export type RecordFieldType<T> =
-  T extends ModelField<infer TSType, boolean, infer NotNullable>
-    ? NotNullable extends true ? TSType : TSType | null
-    : never;
-
 export default class ModelField<TSType, InNew extends boolean = true, NotNullable extends boolean = false> {
   // Type Factory Helpers
 
@@ -118,9 +113,8 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
     return field;
   }
 
-  // _: TSType | null = null;
-
-  // public name: string = '';
+  // NOTE: name is specified by the field key, not in this class.
+  public $wasNamed: string | null = null;
   public $type!: ColumnType;
   public $useInNew: InNew = true as InNew;
   public $unsigned: boolean = false;
@@ -129,6 +123,10 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
   public $default: boolean | number | string | Raw | null = null;
   public $primary: boolean = false;
   public $unique: boolean = false;
+
+  // Fluent mutators ala knex to set the above props.
+  // Includes type coercion to maintain exact type params
+  // for useful derivation via RecordFieldType<T>.
 
   public useInNew<TInNew extends boolean>(inNew: TInNew) {
     const next = this as ModelField<TSType, boolean, NotNullable> as ModelField<TSType, TInNew, NotNullable>;
@@ -168,6 +166,16 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
 
   public unique() {
     this.$unique = true;
+    return this;
+  }
+
+  /**
+   * Specifies that this column previously had a different name.
+   * This should only be kept around for 1 migration.
+   * @param oldName Name of this column in the previous version of the table.
+   */
+  public wasNamed(oldName: string) {
+    this.$wasNamed = oldName;
     return this;
   }
 }
