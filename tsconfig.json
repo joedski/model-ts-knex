@@ -5,7 +5,6 @@
     "lib": ["esnext"],
     "declaration": true,
     "outDir": "lib-es",
-    "rootDir": "lib-ts",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -14,14 +13,16 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@": ["lib-ts"]
+      "@/*": ["lib-ts/*"],
+      "@UNIT/*": ["tests/unit/*"]
     },
     "esModuleInterop": true
   },
   "include": [
-    "lib-ts/**/*"
+    "lib-ts/**/*.ts",
+    "tests/unit/**/*.ts"
   ],
   "exclude": [
-    "tests/**/*"
+    "node_modules"
   ]
 }

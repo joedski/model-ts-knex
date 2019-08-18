@@ -1,6 +1,7 @@
 import Knex from 'knex';
-import { defineBaseModel, RecordType, NewRecordType } from '../BaseModel';
-import ModelField from '../ModelField';
+import { defineBaseModel } from '@/BaseModel';
+import ModelField from '@/ModelField';
+import { RecordType, NewRecordType } from '@/utilTypes';
 
 /**
  * An instance purely for example.
