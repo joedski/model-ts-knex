@@ -1,6 +1,14 @@
 import { Raw } from "knex";
+import { BaseModel } from "./BaseModel";
+import { AnyModelField } from "./utilTypes";
 
 type ColumnType =
+  /**
+   * Knex has special translation for increments, so we're
+   * effectively treating it as a special type.
+   */
+  | ['increments']
+  | ['bigIncrements']
   | ['integer']
   | ['bigInteger']
   /**
@@ -23,99 +31,92 @@ type ColumnType =
   | ['uuid']
   ;
 
+export interface ModelFieldForeignKeyConstraint {
+  model: BaseModel<Record<string, AnyModelField>>;
+  columnName: string;
+  onDelete: null | string | Raw;
+  onUpdate: null | string | Raw;
+}
+
 export default class ModelField<TSType, InNew extends boolean = true, NotNullable extends boolean = false> {
   // Type Factory Helpers
 
+  public static increments() {
+    // NOTE: increments in knex implies a number of things but we don't set those separately here.
+    return new ModelField<number>(['increments']).notNullable();
+  }
+  public static bigIncrements() {
+    // NOTE: bigIncrements in knex implies a number of things but we don't set those separately here.
+    return new ModelField<number>(['bigIncrements']).notNullable();
+  }
   public static integer() {
-    const field = new ModelField<number>();
-    field.$type = ['integer'];
-    return field;
+    return new ModelField<number>(['integer']);
   }
   public static bigInteger() {
-    const field = new ModelField<number>();
-    field.$type = ['bigInteger'];
-    return field;
+    return new ModelField<number>(['bigInteger']);
   }
   public static text() {
-    const field = new ModelField<string>();
-    field.$type = ['text'];
-    return field;
+    return new ModelField<string>(['text']);
   }
   public static string(length: number = 256) {
-    const field = new ModelField<string>();
-    field.$type = ['string', length];
-    return field;
+    return new ModelField<string>(['string', length]);
   }
   public static float(precision?: number, scale?: number) {
-    const field = new ModelField<number>();
-    field.$type = ['float', typeof precision === 'number' ? precision : null, typeof scale === 'number' ? scale : null];
-    return field;
+    return new ModelField<number>(['float', typeof precision === 'number' ? precision : null, typeof scale === 'number' ? scale : null]);
   }
   public static decimal(precision?: number, scale?: number) {
-    const field = new ModelField<number>();
-    field.$type = ['decimal', typeof precision === 'number' ? precision : null, typeof scale === 'number' ? scale : null];
-    return field;
+    return new ModelField<number>(['decimal', typeof precision === 'number' ? precision : null, typeof scale === 'number' ? scale : null]);
   }
   public static boolean() {
-    const field = new ModelField<boolean>();
-    field.$type = ['boolean'];
-    return field;
+    return new ModelField<boolean>(['boolean']);
   }
   public static date() {
     // TODO: You can toggle parsing of dates and get back strings.  How to account for that?
-    const field = new ModelField<Date>();
-    field.$type = ['date'];
-    return field;
+    return new ModelField<Date>(['date']);
   }
   public static datetime(options: { useTz?: boolean; precision?: number } = {}) {
     // TODO: You can toggle parsing of datetimes and get back strings.  How to account for that?
-    const field = new ModelField<Date>();
-    field.$type = ['datetime', options];
-    return field;
+    return new ModelField<Date>(['datetime', options]);
   }
   public static time(precision?: number) {
-    const field = new ModelField<string>();
-    field.$type = ['time', typeof precision === 'number' ? precision : null];
-    return field;
+    return new ModelField<string>(['time', typeof precision === 'number' ? precision : null]);
   }
   public static timestamp(options: { useTz?: boolean; precision?: number } = {}) {
-    const field = new ModelField<Date>();
-    field.$type = ['timestamp', options];
-    return field;
+    return new ModelField<Date>(['timestamp', options]);
   }
   public static binary() {
     // TODO: What's the actual types used here?  Have to check all the drivers, I guess.
-    const field = new ModelField<Buffer | Uint8Array>();
-    field.$type = ['binary'];
-    return field;
+    return new ModelField<Buffer | Uint8Array>(['binary']);
   }
   public static enum<TValues extends Array<string>>(values: TValues, options: { useNative?: boolean; enumName?: string } = {}) {
     // TODO: Enum...
-    const field = new ModelField<TValues>();
-    field.$type = ['enum', values, options];
-    return field;
+    return new ModelField<TValues>(['enum', values, options]);
   }
   public static json<T = unknown>() {
-    // TODO: Should we do anything about json?
-    const field = new ModelField<T>();
-    field.$type = ['json'];
-    return field;
+    // TODO: Should we do anything typewise about json?
+    return new ModelField<T>(['json']);
   }
   public static jsonb<T = unknown>() {
-    // TODO: Should we do anything about json?
-    const field = new ModelField<T>();
-    field.$type = ['jsonb'];
-    return field;
+    // TODO: Should we do anything typewise about json?
+    return new ModelField<T>(['jsonb']);
   }
   public static uuid() {
-    const field = new ModelField<string>();
-    field.$type = ['uuid'];
-    return field;
+    return new ModelField<string>(['uuid']);
+  }
+
+  // Type Factory Convenience Helpers
+
+  public static unsignedInteger() {
+    return ModelField.integer().unsigned();
+  }
+
+  constructor(type: ColumnType) {
+    this.$type = type;
   }
 
   // NOTE: name is specified by the field key, not in this class.
   public $wasNamed: string | null = null;
-  public $type!: ColumnType;
+  public $type: ColumnType;
   public $useInNew: InNew = true as InNew;
   public $unsigned: boolean = false;
   public $comment: string | null = null;
@@ -123,6 +124,7 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
   public $default: boolean | number | string | Raw | null = null;
   public $primary: boolean = false;
   public $unique: boolean = false;
+  public $foreignKeyConstraint: ModelFieldForeignKeyConstraint | null = null;
 
   // Fluent mutators ala knex to set the above props.
   // Includes type coercion to maintain exact type params
@@ -176,6 +178,47 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
    */
   public wasNamed(oldName: string) {
     this.$wasNamed = oldName;
+    return this;
+  }
+
+  /**
+   * Specify a foreign key constraint on this column.
+   * @param modelGetter Function returning a Model interface instance.
+   * @param fieldName Field name on that Model interface instance.
+   */
+  public references<TModel extends BaseModel<Record<string, AnyModelField>>>(modelGetter: () => TModel, fieldName: Extract<keyof TModel['fields'], string>) {
+    this.$foreignKeyConstraint = {
+      get model() {
+        return modelGetter();
+      },
+      columnName: fieldName,
+      onDelete: null,
+      onUpdate: null,
+    };
+    return this;
+  }
+
+  /**
+   * Specify a command to run on delete of a foreign key.
+   * This has no effect unless called after `#references()`.
+   * @param command Command to run on delete, such as 'CASCADE'.
+   */
+  public onDelete(command: string | Raw) {
+    if (this.$foreignKeyConstraint != null) {
+      this.$foreignKeyConstraint.onDelete = command;
+    }
+    return this;
+  }
+
+  /**
+   * Specify a command to run on update of a foreign key.
+   * This has no effect unless called after `#references()`.
+   * @param command Command to run on update.
+   */
+  public onUpdate(command: string | Raw) {
+    if (this.$foreignKeyConstraint != null) {
+      this.$foreignKeyConstraint.onUpdate = command;
+    }
     return this;
   }
 }

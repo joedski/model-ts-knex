@@ -13,16 +13,28 @@ export const knex = Knex({ client: "pg" });
  */
 export const BaseModel = defineBaseModel({ knex });
 
-export class FooModel extends BaseModel({
+class $FooModel extends BaseModel({
   fields: {
-    id: ModelField.integer()
-      .unsigned()
-      .primary()
-      .notNullable()
+    id: ModelField.increments()
       .notInNew(),
-    foo: ModelField.integer()
+    foo: ModelField.integer(),
+    bar_id: ModelField.unsignedInteger().references(() => BarModel, 'id'),
   }
 }) { }
 
-export type FooRecord = RecordType<FooModel>;
-export type NewFooRecord = NewRecordType<FooModel>;
+export const FooModel = new $FooModel();
+
+export type FooRecord = RecordType<$FooModel>;
+export type NewFooRecord = NewRecordType<$FooModel>;
+
+class $BarModel extends BaseModel({
+  fields: {
+    id: ModelField.increments().notInNew(),
+    name: ModelField.string().notNullable(),
+  }
+}) {};
+
+export const BarModel = new $BarModel();
+
+export type BarRecord = RecordType<$BarModel>;
+export type NewBarRecord = NewRecordType<$BarModel>;
