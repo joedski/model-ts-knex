@@ -1,0 +1,252 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JSONSchema Generation should generate a JSON Schema as expected 1`] = `
+Object {
+  "properties": Object {
+    "bigInteger": Object {
+      "type": "string",
+    },
+    "boolean": Object {
+      "type": "boolean",
+    },
+    "date": Object {
+      "format": "date",
+      "type": "string",
+    },
+    "datetime": Object {
+      "format": "date-time",
+      "type": "string",
+    },
+    "decimal": Object {
+      "type": "number",
+    },
+    "enum": Object {
+      "enum": Array [
+        "foo",
+        "bar",
+        "baz",
+        "frabnobz",
+        "diganobz",
+      ],
+      "type": "string",
+    },
+    "fk": Object {
+      "minimum": 0,
+      "type": "integer",
+    },
+    "float": Object {
+      "type": "number",
+    },
+    "id": Object {
+      "minimum": 0,
+      "type": "integer",
+    },
+    "integer": Object {
+      "type": "integer",
+    },
+    "json": Object {
+      "oneOf": Array [
+        Object {
+          "type": "object",
+        },
+        Object {
+          "type": "null",
+        },
+      ],
+    },
+    "jsonb": Object {
+      "oneOf": Array [
+        Object {
+          "type": "object",
+        },
+        Object {
+          "type": "null",
+        },
+      ],
+    },
+    "nullable": Object {
+      "oneOf": Array [
+        Object {
+          "type": "integer",
+        },
+        Object {
+          "type": "null",
+        },
+      ],
+    },
+    "string": Object {
+      "maxLength": 256,
+      "type": "string",
+    },
+    "string20": Object {
+      "maxLength": 20,
+      "type": "string",
+    },
+    "text": Object {
+      "type": "string",
+    },
+    "time": Object {
+      "format": "time",
+      "type": "string",
+    },
+    "timestamp": Object {
+      "format": "date-time",
+      "type": "string",
+    },
+    "unsignedInteger": Object {
+      "minimum": 0,
+      "type": "integer",
+    },
+    "uuid": Object {
+      "format": "uuid",
+      "type": "string",
+    },
+  },
+  "required": Array [
+    "id",
+    "nullable",
+    "integer",
+    "unsignedInteger",
+    "bigInteger",
+    "text",
+    "string",
+    "string20",
+    "float",
+    "decimal",
+    "boolean",
+    "date",
+    "datetime",
+    "time",
+    "timestamp",
+    "enum",
+    "json",
+    "jsonb",
+    "uuid",
+    "fk",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`JSONSchema Generation should generate a JSON Schema as expected 2`] = `
+Object {
+  "properties": Object {
+    "bigInteger": Object {
+      "type": "string",
+    },
+    "boolean": Object {
+      "type": "boolean",
+    },
+    "date": Object {
+      "format": "date",
+      "type": "string",
+    },
+    "datetime": Object {
+      "format": "date-time",
+      "type": "string",
+    },
+    "decimal": Object {
+      "type": "number",
+    },
+    "enum": Object {
+      "enum": Array [
+        "foo",
+        "bar",
+        "baz",
+        "frabnobz",
+        "diganobz",
+      ],
+      "type": "string",
+    },
+    "fk": Object {
+      "minimum": 0,
+      "type": "integer",
+    },
+    "float": Object {
+      "type": "number",
+    },
+    "integer": Object {
+      "type": "integer",
+    },
+    "json": Object {
+      "oneOf": Array [
+        Object {
+          "type": "object",
+        },
+        Object {
+          "type": "null",
+        },
+      ],
+    },
+    "jsonb": Object {
+      "oneOf": Array [
+        Object {
+          "type": "object",
+        },
+        Object {
+          "type": "null",
+        },
+      ],
+    },
+    "nullable": Object {
+      "oneOf": Array [
+        Object {
+          "type": "integer",
+        },
+        Object {
+          "type": "null",
+        },
+      ],
+    },
+    "string": Object {
+      "maxLength": 256,
+      "type": "string",
+    },
+    "string20": Object {
+      "maxLength": 20,
+      "type": "string",
+    },
+    "text": Object {
+      "type": "string",
+    },
+    "time": Object {
+      "format": "time",
+      "type": "string",
+    },
+    "timestamp": Object {
+      "format": "date-time",
+      "type": "string",
+    },
+    "unsignedInteger": Object {
+      "minimum": 0,
+      "type": "integer",
+    },
+    "uuid": Object {
+      "format": "uuid",
+      "type": "string",
+    },
+  },
+  "required": Array [
+    "nullable",
+    "integer",
+    "unsignedInteger",
+    "bigInteger",
+    "text",
+    "string",
+    "string20",
+    "float",
+    "decimal",
+    "boolean",
+    "date",
+    "datetime",
+    "time",
+    "timestamp",
+    "enum",
+    "json",
+    "jsonb",
+    "uuid",
+    "fk",
+  ],
+  "type": "object",
+}
+`;

@@ -25,7 +25,7 @@ type ColumnType =
   | ['time', number | null]
   | ['timestamp', { useTz?: boolean; precision?: number }]
   | ['binary']
-  | ['enum', Array<string> | null, { useNative?: boolean; enumName?: string }]
+  | ['enum', string[] | readonly string[] | null, { useNative?: boolean; enumName?: string }]
   | ['json']
   | ['jsonb']
   | ['uuid']
@@ -47,13 +47,13 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
   }
   public static bigIncrements() {
     // NOTE: bigIncrements in knex implies a number of things but we don't set those separately here.
-    return new ModelField<number>(['bigIncrements']).notNullable();
+    return new ModelField<string>(['bigIncrements']).notNullable();
   }
   public static integer() {
     return new ModelField<number>(['integer']);
   }
   public static bigInteger() {
-    return new ModelField<number>(['bigInteger']);
+    return new ModelField<string>(['bigInteger']);
   }
   public static text() {
     return new ModelField<string>(['text']);
@@ -88,9 +88,9 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
     // TODO: What's the actual types used here?  Have to check all the drivers, I guess.
     return new ModelField<Buffer | Uint8Array>(['binary']);
   }
-  public static enum<TValues extends Array<string>>(values: TValues, options: { useNative?: boolean; enumName?: string } = {}) {
-    // TODO: Enum...
-    return new ModelField<TValues>(['enum', values, options]);
+  public static enum<TValues extends string[] | readonly string[]>(values: TValues, options: { useNative?: boolean; enumName?: string } = {}) {
+    // TODO: Need better enum typing.  Any way to obviate need for `as const`?
+    return new ModelField<TValues[number]>(['enum', values, options]);
   }
   public static json<T = unknown>() {
     // TODO: Should we do anything typewise about json?
@@ -220,5 +220,145 @@ export default class ModelField<TSType, InNew extends boolean = true, NotNullabl
       this.$foreignKeyConstraint.onUpdate = command;
     }
     return this;
+  }
+
+  // Other Methods
+
+  public toJSONSchema() {
+    const notNullableType = (() => {
+      switch (this.$type[0]) {
+        case 'string': {
+          return {
+            type: 'string',
+            maxLength: this.$type[1] || 256,
+          }
+        }
+
+        // These two are serialized as strings since JS will lose precision on them.
+        case 'bigIncrements':
+        case 'bigInteger':
+        case 'text': {
+          return {
+            type: 'string'
+          }
+        }
+
+        case 'increments': {
+          return {
+            type: 'integer',
+            minimum: 0
+          }
+        }
+
+        case 'integer': {
+          if (this.$unsigned) {
+            return {
+              type: 'integer',
+              minimum: 0
+            }
+          }
+          return {
+            type: 'integer'
+          }
+        }
+
+        case 'float':
+        case 'decimal': {
+          return {
+            type: 'number'
+          }
+        }
+
+        case 'boolean': {
+          return {
+            type: 'boolean'
+          }
+        }
+
+        case 'date': {
+          return {
+            type: 'string',
+            format: 'date',
+          }
+        }
+
+        case 'datetime': {
+          return {
+            type: 'string',
+            format: 'date-time',
+          };
+        }
+
+        case 'time': {
+          return {
+            type: 'string',
+            format: 'time',
+          }
+        }
+
+        case 'timestamp': {
+          // TODO: how should timestamps be handled?  datestring?  unix epoch?
+          return {
+            type: 'string',
+            format: 'date-time',
+          }
+        }
+
+        case 'binary': {
+          // TODO: how should binary columns be handled?  if at all?
+          return {
+            type: 'string',
+          }
+        }
+
+        case 'enum': {
+          // TODO: How to handle cases where the dev uses a pre-specified enum?
+          // make them always specify it here?
+          // make them provide a JSONPointer schema reference?
+          if (this.$type[1]) {
+            return {
+              type: 'string',
+              enum: this.$type[1],
+            }
+          }
+          return {
+            type: 'string',
+          }
+        }
+
+        case 'json':
+        case 'jsonb': {
+          // TODO: Something more thorough than this.
+          // May want to have some ability to specify TS/JS type info
+          // which would be better than just having that type param
+          // hovering around without actually doing anything.
+          return {
+            type: 'object'
+          }
+        }
+
+        case 'uuid': {
+          return {
+            type: 'string',
+            format: 'uuid',
+          }
+        }
+
+        default: {
+          throw new Error(`Unknown type "${this.$type[0]}"`);
+        }
+      }
+    })();
+
+    if (this.$notNullable) {
+      return notNullableType;
+    }
+
+    return {
+      oneOf: [
+        notNullableType,
+        { type: 'null' },
+      ],
+    };
   }
 }

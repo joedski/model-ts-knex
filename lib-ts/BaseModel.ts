@@ -24,6 +24,40 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
     public knex: AnyKnex,
     public fields: TFields
   ) {}
+
+  public toRecordJSONSchema() {
+    // Not entirely happy with the return type, but at least for now
+    // it's meant to be sorta opaque.
+    const fieldNames = Object.keys(this.fields);
+    return {
+      type: 'object',
+      required: fieldNames,
+      properties: fieldNames.reduce(
+        (acc, fieldName) => {
+          acc[fieldName] = this.fields[fieldName].toJSONSchema();
+          return acc;
+        },
+        {} as Record<string, object>
+      ),
+    }
+  }
+
+  public toNewRecordJSONSchema() {
+    // Not entirely happy with the return type, but at least for now
+    // it's meant to be sorta opaque.
+    const fieldNames = Object.keys(this.fields).filter(key => this.fields[key].$useInNew);
+    return {
+      type: 'object',
+      required: fieldNames,
+      properties: fieldNames.reduce(
+        (acc, fieldName) => {
+          acc[fieldName] = this.fields[fieldName].toJSONSchema();
+          return acc;
+        },
+        {} as Record<string, object>
+      ),
+    }
+  }
 }
 
 /**
