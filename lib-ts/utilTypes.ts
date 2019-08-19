@@ -54,15 +54,17 @@ export type RecordFieldType<T> = T extends ModelField<
     : TSType | null
   : never;
 
+export type RecordTypeOfFields<T extends Record<string, AnyModelField>> = {
+  [K in keyof T]: RecordFieldType<T[K]>;
+};
+
 /**
  * Gets a plain record type of a given Model.
  */
 export type RecordType<
   TModel extends { fields: Record<string, AnyModelField> }
 > = TModel['fields'] extends Record<string, AnyModelField>
-  ? {
-      [K in keyof TModel['fields']]: RecordFieldType<TModel['fields'][K]>;
-    }
+  ? RecordTypeOfFields<TModel['fields']>
   : never;
 
 /**

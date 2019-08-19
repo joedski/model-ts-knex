@@ -6,8 +6,20 @@ exports[`BaseModel functionality Query Builder Methods should build a basic sele
 
 exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 3`] = `"select \\"id\\", \\"foo\\" from \\"foo\\" where \\"bar_id\\" = 4 limit 1"`;
 
+exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 4`] = `"select * from \\"foo\\" where (\\"bar_id\\" = 1 or (\\"bar_id\\" = 2)) limit 1"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 5`] = `"select \\"id\\" from \\"foo\\" where (\\"bar_id\\" = 1 or (\\"bar_id\\" = 2)) limit 1"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 6`] = `"select \\"id\\", \\"foo\\" from \\"foo\\" where (\\"bar_id\\" = 1 or (\\"bar_id\\" = 2)) limit 1"`;
+
 exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 1`] = `"select * from \\"foo\\" where \\"bar_id\\" = 4"`;
 
 exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 2`] = `"select \\"id\\" from \\"foo\\" where \\"bar_id\\" = 4"`;
 
 exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 3`] = `"select \\"id\\", \\"foo\\" from \\"foo\\" where \\"bar_id\\" = 4"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 4`] = `"select * from \\"foo\\" where (\\"bar_id\\" = 1 or (\\"bar_id\\" = 2))"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 5`] = `"select \\"id\\" from \\"foo\\" where (\\"bar_id\\" = 1 or (\\"bar_id\\" = 2))"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic select with #findWhere 6`] = `"select \\"id\\", \\"foo\\" from \\"foo\\" where (\\"bar_id\\" = 1 or (\\"bar_id\\" = 2))"`;

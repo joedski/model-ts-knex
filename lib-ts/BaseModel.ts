@@ -1,5 +1,12 @@
-import { AnyKnex, AnyModelField, RecordType, ModelFieldKeys, AnyArray } from './utilTypes';
+import {
+  AnyKnex,
+  AnyModelField,
+  ModelFieldKeys,
+  AnyArray,
+  RecordTypeOfFields,
+} from './utilTypes';
 import { tableNameOfModelClassName } from './util';
+import { QueryBuilder } from 'knex';
 
 export interface CreateBaseModelOptions {
   /**
@@ -23,7 +30,9 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
   tableName: string;
 
   constructor(public knex: AnyKnex, public fields: TFields) {
-    this.tableName = tableNameOfModelClassName(Object.getPrototypeOf(this).constructor.name);
+    this.tableName = tableNameOfModelClassName(
+      Object.getPrototypeOf(this).constructor.name
+    );
   }
 
   /**
@@ -40,17 +49,53 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
   // Query Builders.
 
   public findWhere(
-    where: Partial<RecordType<BaseModel<TFields>>>,
+    where:
+      | Partial<RecordTypeOfFields<TFields>>
+      | ((queryBuilder: QueryBuilder) => void)
+  ): QueryBuilder<RecordTypeOfFields<TFields>, RecordTypeOfFields<TFields>[]>;
+  public findWhere<
+    TSelect extends AnyArray<ModelFieldKeys<BaseModel<TFields>>>
+  >(
+    where:
+      | Partial<RecordTypeOfFields<TFields>>
+      | ((queryBuilder: QueryBuilder) => void),
+    select: TSelect
+  ): QueryBuilder<
+    RecordTypeOfFields<TFields>,
+    Pick<RecordTypeOfFields<TFields>, TSelect[number]>[]
+  >;
+  public findWhere(
+    where:
+      | Partial<RecordTypeOfFields<TFields>>
+      | ((queryBuilder: QueryBuilder) => void),
     select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
-  ) {
-    return this.knex.from(this.tableName)
+  ): QueryBuilder<any, any> {
+    return this.knex
+      .from(this.tableName)
       .select(select)
-      .where(where)
-      ;
+      .where(where);
   }
 
   public findOneWhere(
-    where: Partial<RecordType<BaseModel<TFields>>>,
+    where:
+      | Partial<RecordTypeOfFields<TFields>>
+      | ((queryBuilder: QueryBuilder) => void)
+  ): QueryBuilder<RecordTypeOfFields<TFields>, RecordTypeOfFields<TFields>[]>;
+  public findOneWhere<
+    TSelect extends AnyArray<ModelFieldKeys<BaseModel<TFields>>>
+  >(
+    where:
+      | Partial<RecordTypeOfFields<TFields>>
+      | ((queryBuilder: QueryBuilder) => void),
+    select: TSelect
+  ): QueryBuilder<
+    RecordTypeOfFields<TFields>,
+    Pick<RecordTypeOfFields<TFields>, TSelect[number]>[]
+  >;
+  public findOneWhere(
+    where:
+      | Partial<RecordTypeOfFields<TFields>>
+      | ((queryBuilder: QueryBuilder) => void),
     select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
   ) {
     return this.findWhere(where, select).limit(1);
