@@ -4,6 +4,7 @@ import {
   ModelFieldKeys,
   AnyArray,
   RecordTypeOfFields,
+  NewRecordTypeOfFields,
 } from './utilTypes';
 import { tableNameOfModelClassName } from './util';
 import { QueryBuilder } from 'knex';
@@ -23,6 +24,11 @@ export interface ModelParams<
   fields: TFields;
 }
 
+type WhereCondition<TFields extends Record<string, AnyModelField>> =
+  | Partial<RecordTypeOfFields<TFields>>
+  | ((queryBuilder: QueryBuilder) => void)
+  | ((this: QueryBuilder) => void);
+
 /**
  * The underlying BaseModel class that gets later parametrized.
  */
@@ -41,33 +47,32 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
    * @param trx Knex transaction query builder.
    */
   public withTransaction(trx: AnyKnex) {
-    const thisWithTransaction = Object.create(this) as BaseModel<TFields>;
+    const thisWithTransaction = Object.create(this) as this;
     thisWithTransaction.knex = trx;
     return thisWithTransaction;
   }
 
   // Query Builders.
 
+  /**
+   * Find records that match the where-condition.
+   * @param where An object of key/value pairs to match or a querybuilder function.
+   * @param select What fields to return.
+   */
   public findWhere(
-    where:
-      | Partial<RecordTypeOfFields<TFields>>
-      | ((queryBuilder: QueryBuilder) => void)
+    where: WhereCondition<TFields>
   ): QueryBuilder<RecordTypeOfFields<TFields>, RecordTypeOfFields<TFields>[]>;
   public findWhere<
     TSelect extends AnyArray<ModelFieldKeys<BaseModel<TFields>>>
   >(
-    where:
-      | Partial<RecordTypeOfFields<TFields>>
-      | ((queryBuilder: QueryBuilder) => void),
+    where: WhereCondition<TFields>,
     select: TSelect
   ): QueryBuilder<
     RecordTypeOfFields<TFields>,
     Pick<RecordTypeOfFields<TFields>, TSelect[number]>[]
   >;
   public findWhere(
-    where:
-      | Partial<RecordTypeOfFields<TFields>>
-      | ((queryBuilder: QueryBuilder) => void),
+    where: WhereCondition<TFields>,
     select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
   ): QueryBuilder<any, any> {
     return this.knex
@@ -76,29 +81,62 @@ export class BaseModel<TFields extends Record<string, AnyModelField>> {
       .where(where);
   }
 
+  /**
+   * Find the first record that matches the where-condition.
+   * @see `findWhere`
+   * @param where An object of key/value pairs to match or a querybuilder function.
+   * @param select What fields to return.
+   */
   public findOneWhere(
-    where:
-      | Partial<RecordTypeOfFields<TFields>>
-      | ((queryBuilder: QueryBuilder) => void)
+    where: WhereCondition<TFields>
   ): QueryBuilder<RecordTypeOfFields<TFields>, RecordTypeOfFields<TFields>[]>;
   public findOneWhere<
     TSelect extends AnyArray<ModelFieldKeys<BaseModel<TFields>>>
   >(
-    where:
-      | Partial<RecordTypeOfFields<TFields>>
-      | ((queryBuilder: QueryBuilder) => void),
+    where: WhereCondition<TFields>,
     select: TSelect
   ): QueryBuilder<
     RecordTypeOfFields<TFields>,
     Pick<RecordTypeOfFields<TFields>, TSelect[number]>[]
   >;
   public findOneWhere(
-    where:
-      | Partial<RecordTypeOfFields<TFields>>
-      | ((queryBuilder: QueryBuilder) => void),
+    where: WhereCondition<TFields>,
     select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
   ) {
     return this.findWhere(where, select).limit(1);
+  }
+
+  /**
+   * Insert a new record, optionally returning an array containing a value
+   * from the newly inserted record.
+   * @param record New record to insert.
+   * @param returning What prop you want to return after insert, if any.
+   */
+  public insertOne(
+    record: NewRecordTypeOfFields<TFields>
+  ): QueryBuilder<RecordTypeOfFields<TFields>, never[]>;
+  public insertOne<
+    TKey extends Extract<keyof RecordTypeOfFields<TFields>, string>
+  >(
+    record: NewRecordTypeOfFields<TFields>,
+    returning: TKey
+  ): QueryBuilder<
+    RecordTypeOfFields<TFields>,
+    (RecordTypeOfFields<TFields>[TKey])[]
+  >;
+  public insertOne<
+    TKey extends Extract<keyof RecordTypeOfFields<TFields>, string>
+  >(
+    record: NewRecordTypeOfFields<TFields>,
+    returning?: TKey
+  ): QueryBuilder<any, any> {
+    const query = this.knex.into(this.tableName).insert(record);
+
+    if (returning != null) {
+      return query.returning(returning);
+    }
+
+    return query;
   }
 
   // JSON Schema stuff.

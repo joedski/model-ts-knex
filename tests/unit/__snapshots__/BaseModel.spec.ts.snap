@@ -1,5 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`BaseModel functionality Query Builder Methods should build a basic insert with #insertOne 1`] = `"insert into \\"foo\\" (\\"bar_id\\", \\"foo\\") values (2, 25)"`;
+
+exports[`BaseModel functionality Query Builder Methods should build a basic insert with #insertOne 2`] = `"insert into \\"foo\\" (\\"bar_id\\", \\"foo\\") values (2, 25) returning \\"id\\""`;
+
 exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 1`] = `"select * from \\"foo\\" where \\"bar_id\\" = 4 limit 1"`;
 
 exports[`BaseModel functionality Query Builder Methods should build a basic select limited to 1 item with #findOneWhere 2`] = `"select \\"id\\" from \\"foo\\" where \\"bar_id\\" = 4 limit 1"`;

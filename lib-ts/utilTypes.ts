@@ -63,13 +63,15 @@ export type RecordTypeOfFields<T extends Record<string, AnyModelField>> = {
  */
 export type RecordType<
   TModel extends { fields: Record<string, AnyModelField> }
-> = TModel['fields'] extends Record<string, AnyModelField>
-  ? RecordTypeOfFields<TModel['fields']>
-  : never;
+> = RecordTypeOfFields<TModel['fields']>;
+
+export type NewRecordTypeOfFields<
+  T extends Record<string, AnyModelField>
+> = Pick<RecordTypeOfFields<T>, NewRecordFieldKeys<T>>;
 
 /**
  * Gets a plain record type for a new record of a given Model.
  */
 export type NewRecordType<
   TModel extends { fields: Record<string, AnyModelField> }
-> = Pick<RecordType<TModel>, NewRecordFieldKeys<TModel['fields']>>;
+> = NewRecordTypeOfFields<TModel['fields']>;

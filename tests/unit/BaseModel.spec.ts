@@ -83,5 +83,14 @@ describe('BaseModel functionality', () => {
         ).toString()
       ).toMatchSnapshot();
     });
+
+    test('should build a basic insert with #insertOne', () => {
+      expect(
+        FooModel.insertOne({ foo: 25, bar_id: 2 }).toString()
+      ).toMatchSnapshot();
+      expect(
+        FooModel.insertOne({ foo: 25, bar_id: 2 }, 'id').toString()
+      ).toMatchSnapshot();
+    });
   });
 });

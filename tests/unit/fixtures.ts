@@ -1,4 +1,4 @@
-import Knex from 'knex';
+import Knex, { Transaction } from 'knex';
 import { defineBaseModel } from '../../lib-ts/BaseModel';
 import ModelField from '../../lib-ts/ModelField';
 import { RecordType, NewRecordType } from '../../lib-ts/utilTypes';
@@ -12,6 +12,19 @@ export const knex = Knex({ client: 'pg' });
  * Our BaseModel (factory) for tests.
  */
 export const BaseModel = defineBaseModel({ knex });
+
+export function withTransaction<R>(
+  fn: (trx: Transaction) => Promise<R>
+): Promise<R> {
+  let result: R;
+  return knex
+    .transaction(trx =>
+      fn(trx).then(r => {
+        result = r;
+      })
+    )
+    .then(() => result);
+}
 
 class $FooModel extends BaseModel({
   fields: {
