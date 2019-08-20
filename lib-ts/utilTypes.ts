@@ -4,6 +4,10 @@ import ModelField from './ModelField';
 // Copied from knex's .d.ts file.
 type SafePartial<T> = T extends {} ? Partial<T> : any;
 
+/**
+ * Simple type alias to deduplicate a lot of unioning on readonly T[].
+ */
+// TODO: Remove in favor of just using `readonly T[]`?
 export type AnyArray<T> = T[] | readonly T[];
 
 /**
@@ -18,8 +22,13 @@ export type AnyKnex<
   | QueryBuilder<TRecord, TResult>
   | Knex<TRecord, TResult>;
 
+/**
+ * Convenience alias for a common type used in constraints.
+ */
+export type AnyModelFieldset = Record<string, AnyModelField>;
+
 export type ModelFieldKeys<
-  TModel extends { fields: Record<string, AnyModelField> }
+  TModel extends { fields: AnyModelFieldset }
 > = keyof TModel['fields'];
 
 /**
@@ -31,7 +40,7 @@ export type AnyModelField = ModelField<any, boolean, boolean>;
  * Gets only the field keys for fields that should appear in new records,
  * omitting those which don't.
  */
-type NewRecordFieldKeys<TFields> = TFields extends Record<string, AnyModelField>
+type NewRecordFieldKeys<TFields> = TFields extends AnyModelFieldset
   ? keyof TFields extends infer TKeys
     ? TKeys extends keyof TFields
       ? TFields[TKeys] extends ModelField<any, true, any>
@@ -54,24 +63,31 @@ export type RecordFieldType<T> = T extends ModelField<
     : TSType | null
   : never;
 
-export type RecordTypeOfFields<T extends Record<string, AnyModelField>> = {
+/**
+ * Get a plain record type of a given fieldset.
+ */
+export type RecordTypeOfFields<T extends AnyModelFieldset> = {
   [K in keyof T]: RecordFieldType<T[K]>;
 };
 
 /**
- * Gets a plain record type of a given Model.
+ * Get a plain record type of a given Model.
  */
 export type RecordType<
-  TModel extends { fields: Record<string, AnyModelField> }
+  TModel extends { fields: AnyModelFieldset }
 > = RecordTypeOfFields<TModel['fields']>;
 
-export type NewRecordTypeOfFields<
-  T extends Record<string, AnyModelField>
-> = Pick<RecordTypeOfFields<T>, NewRecordFieldKeys<T>>;
+/**
+ * Get a plain record type for a new record of a given fieldset.
+ */
+export type NewRecordTypeOfFields<T extends AnyModelFieldset> = Pick<
+  RecordTypeOfFields<T>,
+  NewRecordFieldKeys<T>
+>;
 
 /**
- * Gets a plain record type for a new record of a given Model.
+ * Get a plain record type for a new record of a given Model.
  */
 export type NewRecordType<
-  TModel extends { fields: Record<string, AnyModelField> }
+  TModel extends { fields: AnyModelFieldset }
 > = NewRecordTypeOfFields<TModel['fields']>;

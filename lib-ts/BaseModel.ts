@@ -1,10 +1,10 @@
 import {
   AnyKnex,
-  AnyModelField,
   ModelFieldKeys,
   AnyArray,
   RecordTypeOfFields,
   NewRecordTypeOfFields,
+  AnyModelFieldset,
 } from './utilTypes';
 import { tableNameOfModelClassName } from './util';
 import { QueryBuilder } from 'knex';
@@ -17,14 +17,12 @@ export interface CreateBaseModelOptions {
   knex: AnyKnex;
 }
 
-export interface ModelParams<
-  TFields extends Record<string, AnyModelField> = {}
-> {
+export interface ModelParams<TFields extends AnyModelFieldset = {}> {
   tableName?: string;
   fields: TFields;
 }
 
-type WhereCondition<TFields extends Record<string, AnyModelField>> =
+type WhereCondition<TFields extends AnyModelFieldset> =
   | Partial<RecordTypeOfFields<TFields>>
   | ((queryBuilder: QueryBuilder) => void)
   | ((this: QueryBuilder) => void);
@@ -32,7 +30,7 @@ type WhereCondition<TFields extends Record<string, AnyModelField>> =
 /**
  * The underlying BaseModel class that gets later parametrized.
  */
-export class BaseModel<TFields extends Record<string, AnyModelField>> {
+export class BaseModel<TFields extends AnyModelFieldset> {
   tableName: string;
 
   constructor(public knex: AnyKnex, public fields: TFields) {

@@ -1,6 +1,6 @@
 import { Raw } from 'knex';
 import { BaseModel } from './BaseModel';
-import { AnyModelField } from './utilTypes';
+import { AnyModelField, AnyModelFieldset } from './utilTypes';
 
 type ColumnType =
   /**
@@ -35,7 +35,7 @@ type ColumnType =
   | ['uuid'];
 
 export interface ModelFieldForeignKeyConstraint {
-  model: BaseModel<Record<string, AnyModelField>>;
+  model: BaseModel<AnyModelFieldset>;
   columnName: string;
   onDelete: null | string | Raw;
   onUpdate: null | string | Raw;
@@ -215,7 +215,7 @@ export default class ModelField<
    * @param modelGetter Function returning a Model interface instance.
    * @param fieldName Field name on that Model interface instance.
    */
-  public references<TModel extends BaseModel<Record<string, AnyModelField>>>(
+  public references<TModel extends BaseModel<AnyModelFieldset>>(
     modelGetter: () => TModel,
     fieldName: Extract<keyof TModel['fields'], string>
   ) {
