@@ -3,6 +3,26 @@ import { defineBaseModel } from '../../lib-ts/BaseModel';
 import ModelField from '../../lib-ts/ModelField';
 import { RecordType, NewRecordType } from '../../lib-ts/utilTypes';
 
+type AssignableTo<T, U> = T extends U ? true : false;
+
+/**
+ * Determines if two types are mutually assignable to each other.
+ * Evaluates to a definite true or false even on unions where one
+ * is a superset of another.
+ */
+// The reason this is done this way is that if the type param
+// being checked is a union, then the conditional type will distribute
+// across members of that union rather than treating the union
+// as a literal.
+export type MutuallyAssignable<T, U> = AssignableTo<T, U> extends AssignableTo<
+  U,
+  T
+>
+  ? AssignableTo<U, T> extends AssignableTo<T, U>
+    ? true
+    : false
+  : false;
+
 /**
  * An instance purely for example.
  */

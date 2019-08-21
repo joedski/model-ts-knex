@@ -60,6 +60,12 @@ export class BaseModel<TFields extends AnyModelFieldset> {
   public findWhere(
     where: WhereCondition<TFields>
   ): QueryBuilder<RecordTypeOfFields<TFields>, RecordTypeOfFields<TFields>[]>;
+
+  public findWhere(
+    where: WhereCondition<TFields>,
+    select: []
+  ): QueryBuilder<RecordTypeOfFields<TFields>, RecordTypeOfFields<TFields>[]>;
+
   public findWhere<
     TSelect extends AnyArray<ModelFieldKeys<BaseModel<TFields>>>
   >(
@@ -69,6 +75,7 @@ export class BaseModel<TFields extends AnyModelFieldset> {
     RecordTypeOfFields<TFields>,
     Pick<RecordTypeOfFields<TFields>, TSelect[number]>[]
   >;
+
   public findWhere(
     where: WhereCondition<TFields>,
     select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
@@ -88,6 +95,7 @@ export class BaseModel<TFields extends AnyModelFieldset> {
   public findOneWhere(
     where: WhereCondition<TFields>
   ): QueryBuilder<RecordTypeOfFields<TFields>, RecordTypeOfFields<TFields>[]>;
+
   public findOneWhere<
     TSelect extends AnyArray<ModelFieldKeys<BaseModel<TFields>>>
   >(
@@ -97,6 +105,7 @@ export class BaseModel<TFields extends AnyModelFieldset> {
     RecordTypeOfFields<TFields>,
     Pick<RecordTypeOfFields<TFields>, TSelect[number]>[]
   >;
+
   public findOneWhere(
     where: WhereCondition<TFields>,
     select: AnyArray<ModelFieldKeys<BaseModel<TFields>>> = []
@@ -113,6 +122,7 @@ export class BaseModel<TFields extends AnyModelFieldset> {
   public insertOne(
     record: NewRecordTypeOfFields<TFields>
   ): QueryBuilder<RecordTypeOfFields<TFields>, never[]>;
+
   public insertOne<
     TKey extends Extract<keyof RecordTypeOfFields<TFields>, string>
   >(
@@ -122,6 +132,7 @@ export class BaseModel<TFields extends AnyModelFieldset> {
     RecordTypeOfFields<TFields>,
     (RecordTypeOfFields<TFields>[TKey])[]
   >;
+
   public insertOne<
     TKey extends Extract<keyof RecordTypeOfFields<TFields>, string>
   >(
