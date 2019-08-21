@@ -3,22 +3,22 @@ import { defineBaseModel } from '../../lib-ts/BaseModel';
 import ModelField from '../../lib-ts/ModelField';
 import { RecordType, NewRecordType } from '../../lib-ts/utilTypes';
 
-type AssignableTo<T, U> = T extends U ? true : false;
+/**
+ * Used as simple wrapping around a type to prevent
+ * other conditional types from invoking distributive behavior
+ * on naked type parameters.
+ *
+ * @see http://www.typescriptlang.org/docs/handbook/advanced-types.html#distributive-conditional-types
+ */
+type Nondistributed<T> = T extends any ? T : never;
 
 /**
  * Determines if two types are mutually assignable to each other.
  * Evaluates to a definite true or false even on unions where one
  * is a superset of another.
  */
-// The reason this is done this way is that if the type param
-// being checked is a union, then the conditional type will distribute
-// across members of that union rather than treating the union
-// as a literal.
-export type MutuallyAssignable<T, U> = AssignableTo<T, U> extends AssignableTo<
-  U,
-  T
->
-  ? AssignableTo<U, T> extends AssignableTo<T, U>
+export type MutuallyAssignable<T, U> = Nondistributed<T> extends U
+  ? Nondistributed<U> extends T
     ? true
     : false
   : false;
