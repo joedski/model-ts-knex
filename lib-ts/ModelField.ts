@@ -1,6 +1,6 @@
 import { Raw } from 'knex';
 import { BaseModel } from './BaseModel';
-import { AnyModelField, AnyModelFieldset } from './utilTypes';
+import { AnyModelFieldset } from './utilTypes';
 
 type ColumnType =
   /**
@@ -215,7 +215,12 @@ export default class ModelField<
    * @param modelGetter Function returning a Model interface instance.
    * @param fieldName Field name on that Model interface instance.
    */
-  public references<TModel extends BaseModel<AnyModelFieldset>>(
+  // NOTE: the constraint used to be `extends BaseModel<AnyFieldset>` but that caused
+  // issues with the QueryBuilder type on the constraint type vs the subclassed type.
+  // Changing it to `any` is kind of a cop-out, but at least `BaseModel<TFields>` itself
+  // still constrains `TFields`.
+  public references<TModel extends BaseModel<any>>(
+    // function to avoid circular dependency issues.
     modelGetter: () => TModel,
     fieldName: Extract<keyof TModel['fields'], string>
   ) {
