@@ -41,10 +41,10 @@ export class BaseModel<TFields extends AnyModelFieldset> {
 
   /**
    * Return a copy of this model instance with the given transaction
-   * as the knex context.
-   * @param trx Knex transaction query builder.
+   * or query builder as its knex context.
+   * @param trx Knex transaction or query builder.
    */
-  public withTransaction(trx: AnyKnex) {
+  public with(trx: AnyKnex) {
     const thisWithTransaction = Object.create(this) as this;
     thisWithTransaction.knex = trx;
     return thisWithTransaction;
